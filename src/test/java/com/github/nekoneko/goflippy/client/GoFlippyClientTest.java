@@ -20,7 +20,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void receiveInvalidStringThenReturnFalseWhenCallRegisterUser() throws Exception {
-        setupUserMockServer(200, "invalid string");
+        setupMockServer(200, "invalid string");
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
@@ -30,7 +30,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void lostConnectionThenReturnFalseWhenCallRegisterUser() throws Exception {
-        setupUserMockServer(200, this.gson.toJson(new User()));
+        setupMockServer(200, this.gson.toJson(new User()));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder()
                 .uri(String.format("http://localhost:%d", MOCK_SERVER_PORT + 1))
@@ -45,7 +45,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void serverErrorThenReturnFalseWhenCallRegisterUser() throws Exception {
-        setupUserMockServer(500, this.gson.toJson(new User()));
+        setupMockServer(500, this.gson.toJson(new User()));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
@@ -55,7 +55,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void receiveInvalidStringThenReturnFalseWhenCallFeatureEnabled() throws Exception {
-        setupUserMockServer(200, "invalid string");
+        setupMockServer(200, "invalid string");
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
@@ -66,7 +66,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void lostConnectionThenReturnFalseWhenCallFeatureEnabled() throws Exception {
-        setupUserMockServer(200, this.gson.toJson(new User()));
+        setupMockServer(200, this.gson.toJson(new User()));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder()
                 .uri(String.format("http://localhost:%d", MOCK_SERVER_PORT + 1))
@@ -82,7 +82,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void serverErrorThenReturnFalseWhenCallFeatureEnabled() throws Exception {
-        setupUserMockServer(500, this.gson.toJson(new User()));
+        setupMockServer(500, this.gson.toJson(new User()));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
@@ -93,7 +93,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void sentValidRequestWithApiKeyToRegisterUser() throws Exception {
-        setupUserMockServer(200, this.gson.toJson(new User()));
+        setupMockServer(200, this.gson.toJson(new User()));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
@@ -104,7 +104,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void sentValidRequestWithPathToRegisterUser() throws Exception {
-        setupUserMockServer(200, this.gson.toJson(new User()));
+        setupMockServer(200, this.gson.toJson(new User()));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
@@ -115,7 +115,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void sentValidRequestWithMethodToRegisterUser() throws Exception {
-        setupUserMockServer(200, this.gson.toJson(new User()));
+        setupMockServer(200, this.gson.toJson(new User()));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
@@ -126,7 +126,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void sentValidRequestWithBodyToRegisterUser() throws Exception {
-        setupUserMockServer(200, this.gson.toJson(new User()));
+        setupMockServer(200, this.gson.toJson(new User()));
         User user = new User();
         user.setEmail("test@example.com");
         user.setUuid("user-uuid");
@@ -146,7 +146,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void sentValidRequestWithApiKeyToFeature() throws Exception {
-        setupUserMockServer(200, this.gson.toJson(new Feature()));
+        setupMockServer(200, this.gson.toJson(new Feature()));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
@@ -158,7 +158,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void sentValidRequestWithPathToFeature() throws Exception {
-        setupUserMockServer(200, this.gson.toJson(new Feature()));
+        setupMockServer(200, this.gson.toJson(new Feature()));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
@@ -170,7 +170,7 @@ public class GoFlippyClientTest {
 
     @Test
     public void sentValidRequestWithMethodToFeature() throws Exception {
-        setupUserMockServer(200, this.gson.toJson(new Feature()));
+        setupMockServer(200, this.gson.toJson(new Feature()));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
@@ -186,7 +186,7 @@ public class GoFlippyClientTest {
         expectedFeature.setKey("feature-A");
         expectedFeature.setEnabled(true);
 
-        setupUserMockServer(200, this.gson.toJson(expectedFeature));
+        setupMockServer(200, this.gson.toJson(expectedFeature));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
@@ -197,13 +197,13 @@ public class GoFlippyClientTest {
     // TODO: Add verify get feature enabled from cache store
 
     @After
-    public void shutdownUserMockServer() throws Exception {
+    public void shutdownMockServer() throws Exception {
         if (this.mockServer != null) {
             this.mockServer.shutdown();
         }
     }
 
-    private void setupUserMockServer(int code, String body) throws Exception {
+    private void setupMockServer(int code, String body) throws Exception {
         final MockWebServer server = new MockWebServer();
         server.enqueue(
                 new MockResponse()
