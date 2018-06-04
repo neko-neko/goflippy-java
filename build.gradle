@@ -73,6 +73,14 @@ artifacts {
     archives sourcesJar, javadocJar, shadowJar
 }
 
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file:${System.getProperty('user.home')}/.m2/repository")
+        }
+    }
+}
+
 idea {
     module {
         downloadJavadoc = true
