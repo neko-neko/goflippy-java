@@ -41,25 +41,25 @@ public class GoFlippyConfigBuilderTest {
     }
 
     @Test
-    public void ReturnDefaultValueWhenCacheLifeTimeSecondsIsNotSetTheValue() {
+    public void returnDefaultValueWhenCacheLifeTimeSecondsIsNotSetTheValue() {
         GoFlippyConfig config = new GoFlippyConfigBuilder().build();
         assertEquals(GoFlippyConfigBuilder.DEFAULT_CACHE_LIFE_TIME_SECONDS, config.getCacheLifeTimeSeconds());
     }
 
     @Test
-    public void ReturnDefaultValueWhenConnectionTimeOutIsNotSetTheValue() {
+    public void returnDefaultValueWhenConnectionTimeOutIsNotSetTheValue() {
         GoFlippyConfig config = new GoFlippyConfigBuilder().build();
         assertEquals(GoFlippyConfigBuilder.DEFAULT_CONNECTION_TIME_OUT, config.getConnectionTimeout());
     }
 
     @Test
-    public void ReturnDefaultValueWhenReadTimeOutIsNotSetTheValue() {
+    public void returnDefaultValueWhenReadTimeOutIsNotSetTheValue() {
         GoFlippyConfig config = new GoFlippyConfigBuilder().build();
         assertEquals(GoFlippyConfigBuilder.DEFAULT_READ_TIME_OUT, config.getReadTimeout());
     }
 
     @Test
-    public void ReturnDefaultValueWhenWriteTimeOutIsNotSetTheValue() {
+    public void returnDefaultValueWhenWriteTimeOutIsNotSetTheValue() {
         GoFlippyConfig config = new GoFlippyConfigBuilder().build();
         assertEquals(GoFlippyConfigBuilder.DEFAULT_WRITE_TIME_OUT, config.getWriteTimeout());
     }
