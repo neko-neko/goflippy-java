@@ -3,7 +3,7 @@ apply plugin: 'maven'
 apply plugin: 'idea'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-version = "1.0"
+version = "1.0.1"
 
 allprojects {
     group = 'com.github.nekoneko.goflippy'
@@ -38,7 +38,7 @@ buildscript {
 }
 
 shadowJar {
-    baseName = 'goflippy-client'
+    baseName = 'goflippy'
 
     dependencies{
         exclude(dependency('com.google.code.gson:.*:.*'))
