@@ -1,5 +1,6 @@
 package com.github.nekoneko.goflippy.client;
 
+import com.github.nekoneko.goflippy.cache.CacheStore;
 import com.github.nekoneko.goflippy.config.GoFlippyConfigBuilder;
 import com.github.nekoneko.goflippy.gson.Feature;
 import com.github.nekoneko.goflippy.gson.User;
@@ -9,9 +10,14 @@ import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
 import org.junit.After;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 public class GoFlippyClientTest {
     private static final int MOCK_SERVER_PORT = 18080;
@@ -181,7 +187,7 @@ public class GoFlippyClientTest {
     }
 
     @Test
-    public void getFeatureEnabled() throws Exception {
+    public void getFeatureEnabledWithUser() throws Exception {
         Feature expectedFeature = new Feature();
         expectedFeature.setKey("feature-A");
         expectedFeature.setEnabled(true);
@@ -194,7 +200,48 @@ public class GoFlippyClientTest {
         assertEquals(expectedFeature.isEnabled(), client.featureEnabled("feature-A", user, false));
     }
 
-    // TODO: Add verify get feature enabled from cache store
+    @Test
+    public void getFeatureEnabledWithUserWriteCache() throws Exception {
+        String featureKey1 = "feature-A";
+        String uuid1 = "uuid-A";
+        Feature expectedFeature = new Feature();
+        expectedFeature.setKey(featureKey1);
+        expectedFeature.setEnabled(true);
+
+        setupMockServer(200, this.gson.toJson(expectedFeature));
+        CacheStore cs = mock(CacheStore.class);
+
+        GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build(), cs);
+        User user = new User();
+        user.setUuid(uuid1);
+        assertEquals(expectedFeature.isEnabled(), client.featureEnabled(featureKey1, user, false));
+
+        ArgumentCaptor<Feature> ac = ArgumentCaptor.forClass(Feature.class);
+        verify(cs).put(eq(featureKey1 + uuid1), ac.capture());
+        assertEquals(ac.getValue().getKey(), expectedFeature.getKey());
+        assertEquals(ac.getValue().isEnabled(), expectedFeature.isEnabled());
+    }
+
+    @Test
+    public void getFeatureEnabledWithUserReadCache() throws Exception {
+        String featureKey1 = "feature-A";
+        String uuid1 = "uuid-A";
+        Feature expectedFeature = new Feature();
+        expectedFeature.setKey(featureKey1);
+        expectedFeature.setEnabled(true);
+
+        setupMockServer(500, "Test NG");
+        CacheStore cs = mock(CacheStore.class);
+        doReturn(expectedFeature).when(cs).get(featureKey1.concat(uuid1));
+        doReturn(true).when(cs).cacheEnabled();
+
+        GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build(), cs);
+        User user = new User();
+        user.setUuid(uuid1);
+        assertEquals(expectedFeature.isEnabled(), client.featureEnabled(featureKey1, user, false));
+
+    }
+
 
     @After
     public void shutdownMockServer() throws Exception {
