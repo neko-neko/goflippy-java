@@ -102,7 +102,7 @@ public class GoFlippyClient {
             }
 
             feature = this.gson.fromJson(response.body().string(), Feature.class);
-            this.store.put(user.getUuid(), feature);
+            this.store.put(key.concat(user.getUuid()), feature);
 
             return feature.isEnabled();
         } catch(JsonSyntaxException je) {
