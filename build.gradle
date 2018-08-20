@@ -4,7 +4,7 @@ apply plugin: 'idea'
 apply plugin: 'jacoco'
 apply plugin: 'com.github.johnrengelman.shadow'
 
-version = "1.0.1"
+version = "1.0.2"
 
 allprojects {
     group = 'com.github.nekoneko.goflippy'
