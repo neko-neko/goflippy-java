@@ -1,7 +1,5 @@
 package com.github.nekoneko.goflippy.cache;
 
-import com.github.nekoneko.goflippy.gson.Feature;
-
 public abstract class CacheStore {
     /**
      * Cache lifetime seconds
@@ -18,20 +16,20 @@ public abstract class CacheStore {
     }
 
     /**
-     * Put a {@link com.github.nekoneko.goflippy.gson.Feature} object
+     * Put a object
      *
      * @param key cache key
-     * @param feature cache object {@link com.github.nekoneko.goflippy.gson.Feature}
+     * @param obj cache object {@link com.github.nekoneko.goflippy.gson.Feature}
      */
-    public abstract void put(String key, Feature feature);
+    public abstract void put(String key, Object obj);
 
     /**
-     * Get a {@link com.github.nekoneko.goflippy.gson.Feature} object from cache store
+     * Get a object from cache store
      *
      * @param key cache key
-     * @return feature instance
+     * @return cache object
      */
-    public abstract Feature get(String key);
+    public abstract Object get(String key);
 
     /**
      * Returns cache enabled?
