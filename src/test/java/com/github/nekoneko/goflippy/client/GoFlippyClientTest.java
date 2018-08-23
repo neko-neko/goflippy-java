@@ -17,10 +17,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.beans.SamePropertyValuesAs.samePropertyValuesAs;
 import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
+import static org.mockito.Mockito.*;
 
 
 public class GoFlippyClientTest {
@@ -261,7 +258,7 @@ public class GoFlippyClientTest {
         ToggleFilter expectedFilter1 = new ToggleFilter();
         expectedFilter1.setType(ToggleFilter.Type.UUID);
         expectedFilter1.setUuids(uuids);
-        ToggleFilter[] expectedFilters = new ToggleFilter[]{ expectedFilter1 };
+        ToggleFilter[] expectedFilters = new ToggleFilter[]{expectedFilter1};
         Feature expected = new Feature();
         expected.setKey("feature-A");
         expected.setEnabled(true);
@@ -273,7 +270,7 @@ public class GoFlippyClientTest {
         assertEquals(expected.isEnabled(), actual.isEnabled());
         assertEquals(expected.getKey(), actual.getKey());
         assertEquals(expected.getFilters().length, actual.getFilters().length);
-        for (int i=0; i<expected.getFilters().length; i++) {
+        for (int i = 0; i < expected.getFilters().length; i++) {
             assertThat(expected.getFilters()[0].getUuids()[i], is(samePropertyValuesAs(actual.getFilters()[0].getUuids()[i])));
         }
     }

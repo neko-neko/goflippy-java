@@ -8,12 +8,12 @@ public class Attribute {
         return key;
     }
 
-    public String getValue() {
-        return value;
-    }
-
     public void setKey(String key) {
         this.key = key;
+    }
+
+    public String getValue() {
+        return value;
     }
 
     public void setValue(String value) {

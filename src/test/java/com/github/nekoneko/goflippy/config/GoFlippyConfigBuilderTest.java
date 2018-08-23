@@ -1,6 +1,7 @@
 package com.github.nekoneko.goflippy.config;
 
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 
 public class GoFlippyConfigBuilderTest {

@@ -16,14 +16,14 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 public class GoFlippyClient {
+    private static final String HTTP_HEADER_API_KEY = "X-API-Key";
+    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
     private final GoFlippyConfig config;
     private final CacheStore store;
     private final OkHttpClient httpClient;
     private final Gson gson = new GsonBuilder()
             .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
             .create();
-    private static final String HTTP_HEADER_API_KEY = "X-API-Key";
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
     /**
      * Constructor
@@ -74,9 +74,9 @@ public class GoFlippyClient {
 
             this.gson.fromJson(response.body().string(), User.class);
             return true;
-        } catch(JsonSyntaxException je) {
+        } catch (JsonSyntaxException je) {
             return false;
-        } catch(IOException e) {
+        } catch (IOException e) {
             return false;
         }
     }
@@ -90,8 +90,8 @@ public class GoFlippyClient {
      * @return true is feature enabled
      */
     public boolean featureEnabled(String key, User user, boolean defaultValue) {
-        UserFeature userFeature = (UserFeature)fromStore(key, user.getUuid());
-        if (userFeature!= null) {
+        UserFeature userFeature = (UserFeature) fromStore(key, user.getUuid());
+        if (userFeature != null) {
             return userFeature.isEnabled();
         }
 
@@ -110,7 +110,7 @@ public class GoFlippyClient {
             this.store.put(key.concat(user.getUuid()), userFeature);
 
             return userFeature.isEnabled();
-        } catch(JsonSyntaxException je) {
+        } catch (JsonSyntaxException je) {
             return defaultValue;
         } catch (IOException e) {
             return defaultValue;
@@ -122,12 +122,11 @@ public class GoFlippyClient {
      *
      * @param key feature key
      * @return feature resource
-     * @throws GoFlippyException
-     *         if GoFlippy API response is successful
-     *         if any exception is thrown
+     * @throws GoFlippyException if GoFlippy API response is successful
+     *                           if any exception is thrown
      */
     public Feature getFeature(String key) throws GoFlippyException {
-         Feature feature = (Feature)fromStore(key);
+        Feature feature = (Feature) fromStore(key);
         if (feature != null) {
             return feature;
         }

@@ -13,16 +13,6 @@ public class InMemoryCacheStore extends CacheStore {
     private ReadWriteLock lock = new ReentrantReadWriteLock();
     private Map<String, CacheEntry> map = new HashMap<>();
 
-    class CacheEntry {
-        private Object obj;
-        private long expire;
-
-        public CacheEntry(Object obj, long expire) {
-            this.obj = obj;
-            this.expire = expire;
-        }
-    }
-
     /**
      * Constructor
      *
@@ -59,5 +49,15 @@ public class InMemoryCacheStore extends CacheStore {
         }
 
         return ent.obj;
+    }
+
+    class CacheEntry {
+        private Object obj;
+        private long expire;
+
+        public CacheEntry(Object obj, long expire) {
+            this.obj = obj;
+            this.expire = expire;
+        }
     }
 }

@@ -9,6 +9,7 @@ public abstract class CacheStore {
 
     /**
      * Constructor
+     *
      * @param cacheLifeTimeSeconds cache TTL
      */
     public CacheStore(long cacheLifeTimeSeconds) {
@@ -33,6 +34,7 @@ public abstract class CacheStore {
 
     /**
      * Returns cache enabled?
+     *
      * @return true/cache enabled
      */
     public boolean cacheEnabled() {

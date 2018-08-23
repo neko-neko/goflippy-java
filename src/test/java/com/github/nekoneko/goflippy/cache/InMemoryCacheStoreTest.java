@@ -2,6 +2,7 @@ package com.github.nekoneko.goflippy.cache;
 
 import com.github.nekoneko.goflippy.gson.Feature;
 import org.junit.Test;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
