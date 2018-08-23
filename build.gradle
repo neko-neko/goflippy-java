@@ -89,7 +89,6 @@ artifacts {
     archives sourcesJar, javadocJar, shadowJar
 }
 
-/*
 uploadArchives {
     repositories {
         mavenDeployer {
@@ -97,7 +96,6 @@ uploadArchives {
         }
     }
 }
-*/
 
 idea {
     module {
