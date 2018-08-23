@@ -2,9 +2,9 @@ package com.github.nekoneko.goflippy.config;
 
 public class GoFlippyConfigBuilder {
     public static final int DEFAULT_CACHE_LIFE_TIME_SECONDS = 60;
-    public static final int DEFAULT_CONNECTION_TIME_OUT = 5;
-    public static final int DEFAULT_READ_TIME_OUT = 5;
-    public static final int DEFAULT_WRITE_TIME_OUT = 5;
+    public static final int DEFAULT_CONNECTION_TIME_OUT = 10;
+    public static final int DEFAULT_READ_TIME_OUT = 10;
+    public static final int DEFAULT_WRITE_TIME_OUT = 10;
 
     protected String uri;
     protected String apiKey;

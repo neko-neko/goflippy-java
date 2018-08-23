@@ -5,7 +5,10 @@ import com.github.nekoneko.goflippy.cache.InMemoryCacheStore;
 import com.github.nekoneko.goflippy.config.GoFlippyConfig;
 import com.github.nekoneko.goflippy.gson.Feature;
 import com.github.nekoneko.goflippy.gson.User;
+import com.github.nekoneko.goflippy.gson.UserFeature;
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 import okhttp3.*;
 
@@ -16,7 +19,9 @@ public class GoFlippyClient {
     private final GoFlippyConfig config;
     private final CacheStore store;
     private final OkHttpClient httpClient;
-    private final Gson gson = new Gson();
+    private final Gson gson = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .create();
     private static final String HTTP_HEADER_API_KEY = "X-API-Key";
     private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
 
@@ -85,9 +90,9 @@ public class GoFlippyClient {
      * @return true is feature enabled
      */
     public boolean featureEnabled(String key, User user, boolean defaultValue) {
-        Feature feature = fromStore(key, user.getUuid());
-        if (feature != null) {
-            return feature.isEnabled();
+        UserFeature userFeature = (UserFeature)fromStore(key, user.getUuid());
+        if (userFeature!= null) {
+            return userFeature.isEnabled();
         }
 
         String endpoint = String.format("%s/v1/users/%s/features/%s", this.config.getUri(), user.getUuid(), key);
@@ -100,15 +105,48 @@ public class GoFlippyClient {
             if (!response.isSuccessful()) {
                 return false;
             }
+            String json = response.body().string();
+            userFeature = this.gson.fromJson(json, UserFeature.class);
+            this.store.put(key.concat(user.getUuid()), userFeature);
 
-            feature = this.gson.fromJson(response.body().string(), Feature.class);
-            this.store.put(key.concat(user.getUuid()), feature);
-
-            return feature.isEnabled();
+            return userFeature.isEnabled();
         } catch(JsonSyntaxException je) {
             return defaultValue;
         } catch (IOException e) {
             return defaultValue;
+        }
+    }
+
+    /**
+     * Get feature
+     *
+     * @param key feature key
+     * @return feature resource
+     * @throws GoFlippyException
+     *         if GoFlippy API response is successful
+     *         if any exception is thrown
+     */
+    public Feature getFeature(String key) throws GoFlippyException {
+         Feature feature = (Feature)fromStore(key);
+        if (feature != null) {
+            return feature;
+        }
+        String endpoint = String.format("%s/v1/features/%s", this.config.getUri(), key);
+        Request request = new Request.Builder()
+                .url(endpoint)
+                .addHeader(HTTP_HEADER_API_KEY, this.config.apiKey())
+                .build();
+        try {
+            Response response = this.httpClient.newCall(request).execute();
+            if (!response.isSuccessful()) {
+                throw new GoFlippyException(String.format("GoFlippy API returned %d", response.code()));
+            }
+            feature = this.gson.fromJson(response.body().string(), Feature.class);
+            this.store.put(key, feature);
+
+            return feature;
+        } catch (Exception e) {
+            throw new GoFlippyException("Failed to get feature resource.", e);
         }
     }
 
@@ -118,7 +156,7 @@ public class GoFlippyClient {
      * @param key cache key
      * @return Feature instance or null(cache not found or expired)
      */
-    private Feature fromStore(String key) {
+    private Object fromStore(String key) {
         if (this.store.cacheEnabled()) {
             return this.store.get(key);
         }
@@ -133,7 +171,8 @@ public class GoFlippyClient {
      * @param uuid user unique id
      * @return Feature instance or null(cache not found or expired)
      */
-    private Feature fromStore(String key, String uuid) {
+    private Object fromStore(String key, String uuid) {
         return this.fromStore(key.concat(uuid));
     }
+
 }

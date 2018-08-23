@@ -1,9 +1,6 @@
 package com.github.nekoneko.goflippy.cache;
 
-import com.github.nekoneko.goflippy.gson.Feature;
-
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -14,14 +11,14 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
  */
 public class InMemoryCacheStore extends CacheStore {
     private ReadWriteLock lock = new ReentrantReadWriteLock();
-    private Map<String, FeatureWithExpire> map = new HashMap<>();
+    private Map<String, CacheEntry> map = new HashMap<>();
 
-    class FeatureWithExpire {
-        private Feature feature;
+    class CacheEntry {
+        private Object obj;
         private long expire;
 
-        public FeatureWithExpire(Feature feature, long expire) {
-            this.feature = feature;
+        public CacheEntry(Object obj, long expire) {
+            this.obj = obj;
             this.expire = expire;
         }
     }
@@ -36,31 +33,31 @@ public class InMemoryCacheStore extends CacheStore {
     }
 
     @Override
-    public void put(String key, Feature feature) {
+    public void put(String key, Object obj) {
         lock.writeLock().lock();
-        map.put(key, new FeatureWithExpire(feature, Instant.now().plusSeconds(cacheLifeTimeSeconds).getEpochSecond()));
+        map.put(key, new CacheEntry(obj, Instant.now().plusSeconds(cacheLifeTimeSeconds).getEpochSecond()));
         lock.writeLock().unlock();
     }
 
     @Override
-    public Feature get(String key) {
-        FeatureWithExpire feature;
+    public Object get(String key) {
+        CacheEntry ent;
 
         lock.readLock().lock();
-        feature = map.get(key);
+        ent = map.get(key);
         lock.readLock().unlock();
-        if (feature == null) {
+        if (ent == null) {
             return null;
         }
 
         long now = Instant.now().getEpochSecond();
-        if (now > feature.expire) {
+        if (now > ent.expire) {
             lock.writeLock().lock();
             map.remove(key);
             lock.writeLock().unlock();
             return null;
         }
 
-        return feature.feature;
+        return ent.obj;
     }
 }

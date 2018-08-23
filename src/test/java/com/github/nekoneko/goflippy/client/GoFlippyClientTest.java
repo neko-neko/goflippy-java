@@ -2,9 +2,10 @@ package com.github.nekoneko.goflippy.client;
 
 import com.github.nekoneko.goflippy.cache.CacheStore;
 import com.github.nekoneko.goflippy.config.GoFlippyConfigBuilder;
-import com.github.nekoneko.goflippy.gson.Feature;
-import com.github.nekoneko.goflippy.gson.User;
+import com.github.nekoneko.goflippy.gson.*;
+import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
@@ -12,16 +13,22 @@ import org.junit.After;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.beans.SamePropertyValuesAs.samePropertyValuesAs;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
+
+
 public class GoFlippyClientTest {
     private static final int MOCK_SERVER_PORT = 18080;
-    private final Gson gson = new Gson();
+    private final Gson gson = new GsonBuilder()
+            .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+            .create();
+
     private MockWebServer mockServer;
 
     @Test
@@ -188,16 +195,15 @@ public class GoFlippyClientTest {
 
     @Test
     public void getFeatureEnabledWithUser() throws Exception {
-        Feature expectedFeature = new Feature();
-        expectedFeature.setKey("feature-A");
-        expectedFeature.setEnabled(true);
+        UserFeature expected = new UserFeature();
+        expected.setEnabled(true);
 
-        setupMockServer(200, this.gson.toJson(expectedFeature));
+        setupMockServer(200, this.gson.toJson(expected));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
         user.setUuid("uuid-A");
-        assertEquals(expectedFeature.isEnabled(), client.featureEnabled("feature-A", user, false));
+        assertEquals(expected.isEnabled(), client.featureEnabled("feature-A", user, false));
     }
 
     @Test
@@ -206,20 +212,22 @@ public class GoFlippyClientTest {
         String uuid1 = "uuid-A";
         Feature expectedFeature = new Feature();
         expectedFeature.setKey(featureKey1);
-        expectedFeature.setEnabled(true);
+        UserFeature expected = new UserFeature();
+        expected.setFeature(expectedFeature);
+        expected.setEnabled(true);
 
-        setupMockServer(200, this.gson.toJson(expectedFeature));
+        setupMockServer(200, this.gson.toJson(expected));
         CacheStore cs = mock(CacheStore.class);
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build(), cs);
         User user = new User();
         user.setUuid(uuid1);
-        assertEquals(expectedFeature.isEnabled(), client.featureEnabled(featureKey1, user, false));
+        assertEquals(expected.isEnabled(), client.featureEnabled(featureKey1, user, false));
 
-        ArgumentCaptor<Feature> ac = ArgumentCaptor.forClass(Feature.class);
+        ArgumentCaptor<UserFeature> ac = ArgumentCaptor.forClass(UserFeature.class);
         verify(cs).put(eq(featureKey1 + uuid1), ac.capture());
-        assertEquals(ac.getValue().getKey(), expectedFeature.getKey());
-        assertEquals(ac.getValue().isEnabled(), expectedFeature.isEnabled());
+        assertEquals(ac.getValue().isEnabled(), expected.isEnabled());
+        assertThat(ac.getValue().getFeature(), is(samePropertyValuesAs(expected.getFeature())));
     }
 
     @Test
@@ -228,20 +236,47 @@ public class GoFlippyClientTest {
         String uuid1 = "uuid-A";
         Feature expectedFeature = new Feature();
         expectedFeature.setKey(featureKey1);
-        expectedFeature.setEnabled(true);
+        UserFeature expected = new UserFeature();
+        expected.setFeature(expectedFeature);
+        expected.setEnabled(true);
 
         setupMockServer(500, "Test NG");
         CacheStore cs = mock(CacheStore.class);
-        doReturn(expectedFeature).when(cs).get(featureKey1.concat(uuid1));
+        doReturn(expected).when(cs).get(featureKey1.concat(uuid1));
         doReturn(true).when(cs).cacheEnabled();
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build(), cs);
         User user = new User();
         user.setUuid(uuid1);
-        assertEquals(expectedFeature.isEnabled(), client.featureEnabled(featureKey1, user, false));
-
+        assertEquals(expected.isEnabled(), client.featureEnabled(featureKey1, user, false));
     }
 
+    @Test
+    public void getFeature() throws Exception {
+        UUID expectedUuid1 = new UUID();
+        expectedUuid1.setUuid("uuid-1");
+        UUID expectedUuid2 = new UUID();
+        expectedUuid2.setUuid("uuid-2");
+        UUID[] uuids = new UUID[]{expectedUuid1, expectedUuid2};
+        ToggleFilter expectedFilter1 = new ToggleFilter();
+        expectedFilter1.setType(ToggleFilter.Type.UUID);
+        expectedFilter1.setUuids(uuids);
+        ToggleFilter[] expectedFilters = new ToggleFilter[]{ expectedFilter1 };
+        Feature expected = new Feature();
+        expected.setKey("feature-A");
+        expected.setEnabled(true);
+        expected.setFilters(expectedFilters);
+
+        setupMockServer(200, this.gson.toJson(expected));
+        GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
+        Feature actual = client.getFeature("feature-A");
+        assertEquals(expected.isEnabled(), actual.isEnabled());
+        assertEquals(expected.getKey(), actual.getKey());
+        assertEquals(expected.getFilters().length, actual.getFilters().length);
+        for (int i=0; i<expected.getFilters().length; i++) {
+            assertThat(expected.getFilters()[0].getUuids()[i], is(samePropertyValuesAs(actual.getFilters()[0].getUuids()[i])));
+        }
+    }
 
     @After
     public void shutdownMockServer() throws Exception {
