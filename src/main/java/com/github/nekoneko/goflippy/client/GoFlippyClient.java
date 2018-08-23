@@ -103,7 +103,7 @@ public class GoFlippyClient {
         try {
             Response response = this.httpClient.newCall(request).execute();
             if (!response.isSuccessful()) {
-                return false;
+                return defaultValue;
             }
             String json = response.body().string();
             userFeature = this.gson.fromJson(json, UserFeature.class);

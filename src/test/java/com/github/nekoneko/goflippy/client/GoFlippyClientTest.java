@@ -91,14 +91,14 @@ public class GoFlippyClientTest {
     }
 
     @Test
-    public void serverErrorThenReturnFalseWhenCallFeatureEnabled() throws Exception {
+    public void serverErrorThenReturnDefaultValueWhenCallFeatureEnabled() throws Exception {
         setupMockServer(500, this.gson.toJson(new User()));
 
         GoFlippyClient client = new GoFlippyClient(new GoFlippyConfigBuilder().uri(String.format("http://localhost:%d", MOCK_SERVER_PORT)).apiKey("TEST-API-KEY").build());
         User user = new User();
         user.setUuid("user-uuid");
 
-        assertFalse(client.featureEnabled("Feature-Key", user, false));
+        assertTrue(client.featureEnabled("Feature-Key", user, true));
     }
 
     @Test
