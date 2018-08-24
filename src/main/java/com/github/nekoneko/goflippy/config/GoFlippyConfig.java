@@ -3,10 +3,10 @@ package com.github.nekoneko.goflippy.config;
 public class GoFlippyConfig {
     private String uri;
     private String apiKey;
-    private int cacheLifeTimeSeconds;
-    private int connectionTimeout;
-    private int readTimeout;
-    private int writeTimeout;
+    private long cacheLifeTimeSeconds;
+    private long connectionTimeout;
+    private long readTimeout;
+    private long writeTimeout;
 
     protected GoFlippyConfig(GoFlippyConfigBuilder builder) {
         this.uri = builder.uri;
@@ -25,19 +25,19 @@ public class GoFlippyConfig {
         return apiKey;
     }
 
-    public int getCacheLifeTimeSeconds() {
+    public long getCacheLifeTimeSeconds() {
         return cacheLifeTimeSeconds;
     }
 
-    public int getConnectionTimeout() {
+    public long getConnectionTimeout() {
         return connectionTimeout;
     }
 
-    public int getReadTimeout() {
+    public long getReadTimeout() {
         return readTimeout;
     }
 
-    public int getWriteTimeout() {
+    public long getWriteTimeout() {
         return writeTimeout;
     }
 }
